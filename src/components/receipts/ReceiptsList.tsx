@@ -1,12 +1,19 @@
 
+import { useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Receipt } from "@/lib/types";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { FileText, Search } from "lucide-react";
-import { useState } from "react";
+import { 
+  FileText, 
+  Search, 
+  AlertCircle,
+  BadgeCheck, 
+  Clock 
+} from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface ReceiptsListProps {
   receipts: Receipt[];
@@ -15,18 +22,38 @@ interface ReceiptsListProps {
 
 const ReceiptsList: React.FC<ReceiptsListProps> = ({ receipts, showMentor = true }) => {
   const [filter, setFilter] = useState("");
+  const { toast } = useToast();
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "paid":
-        return <Badge className="bg-green-500">Paid</Badge>;
+        return (
+          <Badge className="bg-green-500 hover:bg-green-600 flex items-center gap-1 px-2">
+            <BadgeCheck className="h-3 w-3" /> Paid
+          </Badge>
+        );
       case "pending":
-        return <Badge className="bg-yellow-500">Pending</Badge>;
+        return (
+          <Badge className="bg-amber-500 hover:bg-amber-600 flex items-center gap-1 px-2">
+            <Clock className="h-3 w-3" /> Pending
+          </Badge>
+        );
       case "disputed":
-        return <Badge variant="destructive">Disputed</Badge>;
+        return (
+          <Badge variant="destructive" className="flex items-center gap-1 px-2">
+            <AlertCircle className="h-3 w-3" /> Disputed
+          </Badge>
+        );
       default:
         return <Badge>{status}</Badge>;
     }
+  };
+
+  const handleViewReceipt = (receipt: Receipt) => {
+    toast({
+      title: "Viewing Receipt",
+      description: `Viewing receipt for ${receipt.mentorName}`,
+    });
   };
 
   // Filter receipts based on search input
@@ -52,9 +79,9 @@ const ReceiptsList: React.FC<ReceiptsListProps> = ({ receipts, showMentor = true
         />
       </div>
       
-      <div className="rounded-md border">
+      <div className="rounded-md border shadow-sm overflow-hidden">
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-primary/5">
             <TableRow>
               <TableHead>Receipt ID</TableHead>
               {showMentor && <TableHead>Mentor</TableHead>}
@@ -75,19 +102,34 @@ const ReceiptsList: React.FC<ReceiptsListProps> = ({ receipts, showMentor = true
               </TableRow>
             ) : (
               filteredReceipts.map((receipt) => (
-                <TableRow key={receipt.id}>
-                  <TableCell className="font-mono text-xs">{receipt.id}</TableCell>
-                  {showMentor && <TableCell>{receipt.mentorName}</TableCell>}
+                <TableRow key={receipt.id} className="hover:bg-muted/30 transition-colors">
+                  <TableCell className="font-mono text-xs">{receipt.id.substring(0, 8)}...</TableCell>
+                  {showMentor && <TableCell className="font-medium">{receipt.mentorName}</TableCell>}
                   <TableCell>{formatDate(receipt.dateGenerated)}</TableCell>
                   <TableCell>
-                    {formatDate(receipt.dateRange.start)} - {formatDate(receipt.dateRange.end)}
+                    <div className="flex flex-col">
+                      <span>{formatDate(receipt.dateRange.start)}</span>
+                      <span className="text-muted-foreground text-xs">to</span>
+                      <span>{formatDate(receipt.dateRange.end)}</span>
+                    </div>
                   </TableCell>
-                  <TableCell>{receipt.sessions.length}</TableCell>
-                  <TableCell>{formatCurrency(receipt.breakdown.finalAmount)}</TableCell>
+                  <TableCell className="font-medium text-center">
+                    <span className="bg-primary/10 px-2 py-1 rounded-full text-primary text-xs">
+                      {receipt.sessions.length}
+                    </span>
+                  </TableCell>
+                  <TableCell className="font-medium text-primary">
+                    {formatCurrency(receipt.breakdown.finalAmount)}
+                  </TableCell>
                   <TableCell>{getStatusBadge(receipt.status)}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
-                      <Button variant="outline" size="sm">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => handleViewReceipt(receipt)}
+                        className="hover:bg-primary/10"
+                      >
                         <FileText className="h-4 w-4 mr-1" /> View
                       </Button>
                     </div>

@@ -23,7 +23,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon, FileText, Loader2 } from "lucide-react";
 import { User, Session, Receipt, PayoutBreakdown } from "@/lib/types";
 import { mockData } from "@/lib/mock-data";
 import { v4 as uuidv4 } from "uuid";
@@ -44,6 +44,7 @@ const GenerateReceiptModal = ({ isOpen, onClose, onGenerate }: GenerateReceiptMo
   const [startDate, setStartDate] = useState<Date | undefined>(new Date());
   const [endDate, setEndDate] = useState<Date | undefined>(new Date());
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGeneratingPreview, setIsGeneratingPreview] = useState(false);
   const [previewData, setPreviewData] = useState<{
     sessions: Session[];
     baseAmount: number;
@@ -110,41 +111,49 @@ const GenerateReceiptModal = ({ isOpen, onClose, onGenerate }: GenerateReceiptMo
       return;
     }
     
-    const sessions = getSessionsForMentor();
+    setIsGeneratingPreview(true);
     
-    if (sessions.length === 0) {
-      toast({
-        title: "No Sessions Found",
-        description: "No completed sessions found for this mentor in the selected date range",
-        variant: "destructive",
+    setTimeout(() => {
+      const sessions = getSessionsForMentor();
+      
+      if (sessions.length === 0) {
+        toast({
+          title: "No Sessions Found",
+          description: "No completed sessions found for this mentor in the selected date range",
+          variant: "destructive",
+        });
+        setPreviewData(null);
+        setIsGeneratingPreview(false);
+        return;
+      }
+      
+      const breakdown = calculatePayoutBreakdown(sessions);
+      
+      if (!breakdown) {
+        toast({
+          title: "Calculation Error",
+          description: "Could not calculate payout breakdown",
+          variant: "destructive",
+        });
+        setIsGeneratingPreview(false);
+        return;
+      }
+      
+      setPreviewData({
+        sessions,
+        baseAmount: breakdown.baseAmount,
+        platformFee: breakdown.platformFee,
+        taxAmount: breakdown.taxAmount,
+        finalAmount: breakdown.finalAmount,
       });
-      setPreviewData(null);
-      return;
-    }
-    
-    const breakdown = calculatePayoutBreakdown(sessions);
-    
-    if (!breakdown) {
+      
       toast({
-        title: "Calculation Error",
-        description: "Could not calculate payout breakdown",
-        variant: "destructive",
+        title: "Preview Generated",
+        description: `Found ${sessions.length} sessions with a total payout of ${formatCurrency(breakdown.finalAmount)}`,
       });
-      return;
-    }
-    
-    setPreviewData({
-      sessions,
-      baseAmount: breakdown.baseAmount,
-      platformFee: breakdown.platformFee,
-      taxAmount: breakdown.taxAmount,
-      finalAmount: breakdown.finalAmount,
-    });
-    
-    toast({
-      title: "Preview Generated",
-      description: `Found ${sessions.length} sessions with a total payout of ${formatCurrency(breakdown.finalAmount)}`,
-    });
+      
+      setIsGeneratingPreview(false);
+    }, 800); // Simulated delay for better UX feedback
   };
 
   // Handle form submission
@@ -189,24 +198,28 @@ const GenerateReceiptModal = ({ isOpen, onClose, onGenerate }: GenerateReceiptMo
         notes: notes.trim() || undefined,
       };
       
-      // Pass to parent component
-      onGenerate(newReceipt);
+      // Short timeout to simulate processing
+      setTimeout(() => {
+        // Pass to parent component
+        onGenerate(newReceipt);
+        
+        toast({
+          title: "Success",
+          description: "Receipt generated successfully!",
+        });
+        
+        // Reset form and close modal
+        resetForm();
+        onClose();
+        setIsSubmitting(false);
+      }, 1000);
       
-      toast({
-        title: "Success",
-        description: "Receipt generated successfully!",
-      });
-      
-      // Reset form and close modal
-      resetForm();
-      onClose();
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to generate receipt. Please try again.",
         variant: "destructive",
       });
-    } finally {
       setIsSubmitting(false);
     }
   };
@@ -223,10 +236,10 @@ const GenerateReceiptModal = ({ isOpen, onClose, onGenerate }: GenerateReceiptMo
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Generate Receipt</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-2xl font-bold text-primary">Generate Receipt</DialogTitle>
+          <DialogDescription className="text-muted-foreground">
             Create a new payout receipt for a mentor
           </DialogDescription>
         </DialogHeader>
@@ -331,19 +344,35 @@ const GenerateReceiptModal = ({ isOpen, onClose, onGenerate }: GenerateReceiptMo
             />
           </div>
           
-          <Button type="button" onClick={handleGeneratePreview}>
-            Generate Preview
+          <Button 
+            type="button"
+            onClick={handleGeneratePreview}
+            disabled={isGeneratingPreview}
+            className="bg-primary/90 hover:bg-primary"
+          >
+            {isGeneratingPreview ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...
+              </>
+            ) : (
+              <>
+                <FileText className="mr-2 h-4 w-4" /> Generate Preview
+              </>
+            )}
           </Button>
           
           {previewData && (
-            <div className="border rounded-md p-4 mt-2">
-              <h4 className="font-medium mb-2">Preview</h4>
+            <div className="border rounded-md p-4 mt-2 bg-primary/5 shadow-sm">
+              <h4 className="font-medium mb-2 text-lg text-primary">Preview</h4>
               <div className="space-y-3">
-                <div className="text-sm">
-                  <span className="font-medium">Sessions:</span> {previewData.sessions.length}
+                <div className="flex justify-between items-center bg-background p-2 rounded-md">
+                  <span className="font-medium text-primary">Sessions:</span> 
+                  <span className="bg-primary/10 px-2 py-1 rounded text-primary font-medium">
+                    {previewData.sessions.length}
+                  </span>
                 </div>
-                <div className="space-y-1 text-sm">
-                  <div className="flex justify-between">
+                <div className="space-y-1 text-sm border-t pt-3">
+                  <div className="flex justify-between font-medium">
                     <span>Base Amount</span>
                     <span>{formatCurrency(previewData.baseAmount)}</span>
                   </div>
@@ -355,7 +384,7 @@ const GenerateReceiptModal = ({ isOpen, onClose, onGenerate }: GenerateReceiptMo
                     <span>Tax ({taxPercent}%)</span>
                     <span>- {formatCurrency(previewData.taxAmount)}</span>
                   </div>
-                  <div className="flex justify-between font-medium pt-2 border-t">
+                  <div className="flex justify-between font-medium pt-2 border-t text-primary">
                     <span>Final Payout</span>
                     <span>{formatCurrency(previewData.finalAmount)}</span>
                   </div>
@@ -372,8 +401,15 @@ const GenerateReceiptModal = ({ isOpen, onClose, onGenerate }: GenerateReceiptMo
           <Button 
             onClick={handleSubmit} 
             disabled={!previewData || isSubmitting}
+            className="bg-primary/90 hover:bg-primary"
           >
-            {isSubmitting ? "Generating..." : "Generate Receipt"}
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...
+              </>
+            ) : (
+              "Generate Receipt"
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>
