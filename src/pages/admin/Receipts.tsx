@@ -4,17 +4,39 @@ import AdminLayout from "@/components/layouts/AdminLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { mockData } from "@/lib/mock-data";
+import { Receipt } from "@/lib/types";
 import ReceiptsList from "@/components/receipts/ReceiptsList";
+import GenerateReceiptModal from "@/components/receipts/GenerateReceiptModal";
 import { Button } from "@/components/ui/button";
 import { CalendarRange, PlusCircle } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const AdminReceipts = () => {
   const [statusFilter, setStatusFilter] = useState("all");
+  const [receipts, setReceipts] = useState(mockData.receipts);
+  const [isGenerateModalOpen, setIsGenerateModalOpen] = useState(false);
+  const { toast } = useToast();
   
   // Filter receipts based on selected status
   const filteredReceipts = statusFilter === "all"
-    ? mockData.receipts
-    : mockData.receipts.filter((receipt) => receipt.status === statusFilter);
+    ? receipts
+    : receipts.filter((receipt) => receipt.status === statusFilter);
+  
+  const handleOpenGenerateModal = () => {
+    setIsGenerateModalOpen(true);
+  };
+  
+  const handleCloseGenerateModal = () => {
+    setIsGenerateModalOpen(false);
+  };
+  
+  const handleGenerateReceipt = (newReceipt: Receipt) => {
+    setReceipts((prevReceipts) => [newReceipt, ...prevReceipts]);
+    toast({
+      title: "Receipt Generated",
+      description: `Receipt for ${newReceipt.mentorName} has been generated successfully.`,
+    });
+  };
   
   return (
     <AdminLayout title="Receipts">
@@ -38,7 +60,7 @@ const AdminReceipts = () => {
                 <SelectItem value="disputed">Disputed</SelectItem>
               </SelectContent>
             </Select>
-            <Button>
+            <Button onClick={handleOpenGenerateModal}>
               <PlusCircle className="h-4 w-4 mr-2" />
               Generate Receipt
             </Button>
@@ -48,6 +70,12 @@ const AdminReceipts = () => {
           <ReceiptsList receipts={filteredReceipts} />
         </CardContent>
       </Card>
+      
+      <GenerateReceiptModal 
+        isOpen={isGenerateModalOpen}
+        onClose={handleCloseGenerateModal}
+        onGenerate={handleGenerateReceipt}
+      />
     </AdminLayout>
   );
 };

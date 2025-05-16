@@ -7,6 +7,7 @@ import { formatCurrency, formatDate, formatTime } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
+import SessionDetailsModal from "./SessionDetailsModal";
 
 interface SessionTableProps {
   sessions: Session[];
@@ -15,6 +16,8 @@ interface SessionTableProps {
 
 const SessionTable: React.FC<SessionTableProps> = ({ sessions, showMentor = true }) => {
   const [filter, setFilter] = useState("");
+  const [selectedSession, setSelectedSession] = useState<Session | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   
   const getSessionTypeLabel = (type: SessionType) => {
     switch (type) {
@@ -44,6 +47,15 @@ const SessionTable: React.FC<SessionTableProps> = ({ sessions, showMentor = true
 
   const calculateSessionAmount = (session: Session) => {
     return (session.hourlyRate / 60) * session.duration;
+  };
+
+  const handleViewDetails = (session: Session) => {
+    setSelectedSession(session);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
   };
 
   // Filter sessions based on search input
@@ -105,7 +117,7 @@ const SessionTable: React.FC<SessionTableProps> = ({ sessions, showMentor = true
                   <TableCell>{formatCurrency(calculateSessionAmount(session))}</TableCell>
                   <TableCell>{getStatusBadge(session.status)}</TableCell>
                   <TableCell className="text-right">
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" onClick={() => handleViewDetails(session)}>
                       View Details
                     </Button>
                   </TableCell>
@@ -115,6 +127,12 @@ const SessionTable: React.FC<SessionTableProps> = ({ sessions, showMentor = true
           </TableBody>
         </Table>
       </div>
+      
+      <SessionDetailsModal 
+        session={selectedSession}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+      />
     </div>
   );
 };
