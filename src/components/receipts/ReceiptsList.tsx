@@ -28,7 +28,7 @@ const ReceiptsList: React.FC<ReceiptsListProps> = ({ receipts, showMentor = true
     switch (status) {
       case "paid":
         return (
-          <Badge className="bg-green-500 hover:bg-green-600 flex items-center gap-1 px-2">
+          <Badge className="bg-pistachio-500 hover:bg-pistachio-600 flex items-center gap-1 px-2">
             <BadgeCheck className="h-3 w-3" /> Paid
           </Badge>
         );
@@ -70,18 +70,18 @@ const ReceiptsList: React.FC<ReceiptsListProps> = ({ receipts, showMentor = true
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2">
-        <Search className="h-4 w-4 text-muted-foreground" />
+        <Search className="h-4 w-4 text-lavender-600" />
         <Input
           placeholder="Search receipts..."
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          className="max-w-sm"
+          className="max-w-sm border-lavender-200 focus-visible:ring-lavender-500"
         />
       </div>
       
-      <div className="rounded-md border shadow-sm overflow-hidden">
+      <div className="rounded-md border border-pistachio-100 shadow-sm overflow-hidden">
         <Table>
-          <TableHeader className="bg-primary/5">
+          <TableHeader className="bg-lavender-50">
             <TableRow>
               <TableHead>Receipt ID</TableHead>
               {showMentor && <TableHead>Mentor</TableHead>}
@@ -102,9 +102,9 @@ const ReceiptsList: React.FC<ReceiptsListProps> = ({ receipts, showMentor = true
               </TableRow>
             ) : (
               filteredReceipts.map((receipt) => (
-                <TableRow key={receipt.id} className="hover:bg-muted/30 transition-colors">
+                <TableRow key={receipt.id} className="hover:bg-lavender-50/50 transition-colors">
                   <TableCell className="font-mono text-xs">{receipt.id.substring(0, 8)}...</TableCell>
-                  {showMentor && <TableCell className="font-medium">{receipt.mentorName}</TableCell>}
+                  {showMentor && <TableCell className="font-medium text-lavender-700">{receipt.mentorName}</TableCell>}
                   <TableCell>{formatDate(receipt.dateGenerated)}</TableCell>
                   <TableCell>
                     <div className="flex flex-col">
@@ -114,11 +114,11 @@ const ReceiptsList: React.FC<ReceiptsListProps> = ({ receipts, showMentor = true
                     </div>
                   </TableCell>
                   <TableCell className="font-medium text-center">
-                    <span className="bg-primary/10 px-2 py-1 rounded-full text-primary text-xs">
+                    <span className="bg-pistachio-100 text-pistachio-800 px-2 py-1 rounded-full text-xs">
                       {receipt.sessions.length}
                     </span>
                   </TableCell>
-                  <TableCell className="font-medium text-primary">
+                  <TableCell className="font-medium text-lavender-700">
                     {formatCurrency(receipt.breakdown.finalAmount)}
                   </TableCell>
                   <TableCell>{getStatusBadge(receipt.status)}</TableCell>
@@ -128,7 +128,7 @@ const ReceiptsList: React.FC<ReceiptsListProps> = ({ receipts, showMentor = true
                         variant="outline" 
                         size="sm"
                         onClick={() => handleViewReceipt(receipt)}
-                        className="hover:bg-primary/10"
+                        className="hover:bg-lavender-100 border-lavender-200 text-lavender-700"
                       >
                         <FileText className="h-4 w-4 mr-1" /> View
                       </Button>
