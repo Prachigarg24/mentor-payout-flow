@@ -63,7 +63,7 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Add custom pistachio and lavender color palette
+				// Enhance the pistachio and lavender color palettes
 				pistachio: {
 					50: '#f6fbee',
 					100: '#ecf7dc',
@@ -115,6 +115,10 @@ export default {
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out'
+			},
+			backgroundImage: {
+				'pista-gradient': 'linear-gradient(to right, #ecf7dc, #d8eeb8)',
+				'lavender-gradient': 'linear-gradient(to right, #d8d0ed, #baace0)'
 			}
 		}
 	},

@@ -79,9 +79,9 @@ const ReceiptsList: React.FC<ReceiptsListProps> = ({ receipts, showMentor = true
         />
       </div>
       
-      <div className="rounded-md border border-pistachio-100 shadow-sm overflow-hidden">
+      <div className="rounded-md border border-pistachio-200 shadow-sm overflow-hidden">
         <Table>
-          <TableHeader className="bg-lavender-50">
+          <TableHeader className="bg-pistachio-100">
             <TableRow>
               <TableHead>Receipt ID</TableHead>
               {showMentor && <TableHead>Mentor</TableHead>}
@@ -102,7 +102,7 @@ const ReceiptsList: React.FC<ReceiptsListProps> = ({ receipts, showMentor = true
               </TableRow>
             ) : (
               filteredReceipts.map((receipt) => (
-                <TableRow key={receipt.id} className="hover:bg-lavender-50/50 transition-colors">
+                <TableRow key={receipt.id} className="hover:bg-pistachio-50 transition-colors">
                   <TableCell className="font-mono text-xs">{receipt.id.substring(0, 8)}...</TableCell>
                   {showMentor && <TableCell className="font-medium text-lavender-700">{receipt.mentorName}</TableCell>}
                   <TableCell>{formatDate(receipt.dateGenerated)}</TableCell>
@@ -114,7 +114,7 @@ const ReceiptsList: React.FC<ReceiptsListProps> = ({ receipts, showMentor = true
                     </div>
                   </TableCell>
                   <TableCell className="font-medium text-center">
-                    <span className="bg-pistachio-100 text-pistachio-800 px-2 py-1 rounded-full text-xs">
+                    <span className="bg-lavender-100 text-lavender-800 px-2 py-1 rounded-full text-xs">
                       {receipt.sessions.length}
                     </span>
                   </TableCell>

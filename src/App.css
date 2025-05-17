@@ -36,8 +36,8 @@
 
 .card {
   padding: 2em;
-  background-color: rgba(208, 233, 188, 0.1);
-  border: 1px solid rgba(144, 195, 71, 0.2);
+  background-color: rgba(208, 233, 188, 0.2);
+  border: 1px solid rgba(144, 195, 71, 0.3);
   border-radius: var(--radius);
 }
 
