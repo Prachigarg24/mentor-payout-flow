@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,9 +12,17 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Check if user is already logged in, redirect them accordingly
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      // Redirect based on user role
+      navigate(user.role === 'admin' ? '/admin' : '/mentor');
+    }
+  }, [isAuthenticated, user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,7 +42,7 @@ const Login = () => {
         title: 'Success',
         description: 'Logged in successfully',
       });
-      navigate(email.includes('admin') ? '/admin' : '/mentor');
+      // The useEffect will handle redirection now
     } catch (error) {
       toast({
         title: 'Error',
