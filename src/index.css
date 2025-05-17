@@ -103,3 +103,92 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Colorful background gradients */
+.bg-gradient-pistachio {
+  background: linear-gradient(135deg, #d8eeb8 0%, #90c347 100%);
+}
+
+.bg-gradient-lavender {
+  background: linear-gradient(135deg, #d8d0ed 0%, #7051b0 100%);
+}
+
+.bg-gradient-mixed {
+  background: linear-gradient(135deg, #d8eeb8 0%, #d8d0ed 50%, #8369c2 100%);
+}
+
+.bg-gradient-waves {
+  background-image: 
+    linear-gradient(135deg, rgba(131, 105, 194, 0.4) 25%, transparent 25%),
+    linear-gradient(225deg, rgba(131, 105, 194, 0.4) 25%, transparent 25%),
+    linear-gradient(315deg, rgba(131, 105, 194, 0.4) 25%, transparent 25%),
+    linear-gradient(45deg, rgba(131, 105, 194, 0.4) 25%, transparent 25%);
+  background-size: 60px 60px;
+  background-color: rgba(144, 195, 71, 0.2);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.animated-gradient {
+  background: linear-gradient(-45deg, #c3e494, #d8d0ed, #baace0, #aeda6e);
+  background-size: 400% 400%;
+  animation: gradient 15s ease infinite;
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em rgba(144, 195, 71, 0.6));
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em rgba(131, 105, 194, 0.6));
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+  background-color: rgba(208, 233, 188, 0.2);
+  border: 1px solid rgba(144, 195, 71, 0.3);
+  border-radius: var(--radius);
+}
+
+.read-the-docs {
+  color: hsl(var(--muted-foreground));
+}
